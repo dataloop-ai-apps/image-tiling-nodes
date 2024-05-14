@@ -1,7 +1,7 @@
 {
   "displayName": "Image Tiling Split",
   "name": "image-tiling-split",
-  "scope": "project",
+  "scope": "public",
   "version": "0.0.3",
   "description": "Split image to tiles based on tile size and minimal overlap",
   "attributes": {
