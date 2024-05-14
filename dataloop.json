@@ -11,6 +11,12 @@
     "Node Type": "Image Utils"
   },
 
+  "codebase": {
+    "type": "git",
+    "gitUrl": "https://github.com/dataloop-ai-apps/image-tiling-nodes.git",
+    "gitTag": "0.0.2"
+  },
+
   "components": {
     "pipelineNodes": [
       {
