@@ -1,0 +1,6 @@
+opencv-python
+numpy
+tiling
+shapely
+dtlpy
+rtree

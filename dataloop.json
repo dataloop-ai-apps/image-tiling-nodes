@@ -1,0 +1,220 @@
+{
+  "displayName": "Image Tiling Split",
+  "name": "image-tiling-split",
+  "scope": "project",
+  "version": "0.0.2",
+  "description": "Split image to tiles based on tile size and minimal overlap",
+  "attributes": {
+    "Provider": "Dataloop",
+    "Category": "Pipeline",
+    "Pipeline Type": "Node",
+    "Node Type": "Image Utils"
+  },
+
+  "components": {
+    "pipelineNodes": [
+      {
+        "invoke": {
+          "type": "function",
+          "namespace": "image-tiling-split.image_tiling_split.split_image"
+        },
+        "categories": ["image-utils"],
+        "name": "Split Image",
+        "displayName": "Split Image",
+        "description": "Split image to tiles based on tile size and minimal overlap",
+        "scope": "project",
+        "configuration": {
+          "fields": [
+            {
+              "name": "tile_size",
+              "title": "Tile Size",
+              "props": {
+                "title": true,
+                "type": "number",
+                "default": 500,
+                "required": true,
+                "placeholder": "Insert tile size"
+              },
+              "rules": [
+                {
+                  "type": "required",
+                  "effect": "error"
+                },
+                {
+                  "type": "gte",
+                  "value": 1e-7,
+                  "effect": "error",
+                  "errorMessage": "Tile size must be greater than 0"
+                }
+              ],
+              "widget": "dl-input"
+            },
+            {
+              "name": "min_overlapping",
+              "title": "Minimal Overlapping",
+              "props": {
+                "title": true,
+                "type": "number",
+                "default": 50,
+                "required": true,
+                "placeholder": "Insert minimal overlapping"
+              },
+              "rules": [
+                {
+                  "type": "required",
+                  "effect": "error"
+                },
+                {
+                  "type": "gte",
+                  "value": 1e-7,
+                  "effect": "error",
+                  "errorMessage": "Minimal Overlapping must be greater than 0"
+                }
+              ],
+              "widget": "dl-input"
+            }
+          ]
+        }
+      },
+      {
+        "invoke": {
+          "type": "function",
+          "namespace": "wait-service.wait_module.wait_for_cycle"
+        },
+        "categories": ["image-utils"],
+        "name": "wait_for_cycle",
+        "displayName": "Wait For Cycle",
+        "description": "This function will wait till all executions before it are done",
+        "scope": "project"
+      },
+      {
+        "invoke": {
+          "type": "function",
+          "namespace": "image-tiling-split.image_tiling_split.add_to_parent_item"
+        },
+        "categories": ["image-utils"],
+        "name": "add_to_parent_item",
+        "displayName": "Add Annotations To Main Item",
+        "description": "This function will add all annotations to the main item",
+        "scope": "project"
+      }
+    ],
+    "modules": [
+      {
+        "name": "image_tiling_split",
+        "entryPoint": "split_image.py",
+        "className": "TilingBase",
+        "initInputs": [],
+        "functions": [
+          {
+            "name": "split_image",
+            "input": [
+              {
+                "type": "Item",
+                "name": "item"
+              }
+            ],
+            "output": [
+              {
+                "type": "Item[]",
+                "name": "items"
+              }
+            ],
+            "displayIcon": "distribution-filled"
+          },
+          {
+            "name": "add_to_parent_item",
+            "input": [
+              {
+                "type": "Item",
+                "name": "item"
+              }
+            ],
+            "output": [
+              {
+                "type": "Item",
+                "name": "item"
+              }
+            ],
+            "displayIcon": "distribution-filled"
+          }
+        ]
+      },
+      {
+        "name": "wait_module",
+        "entryPoint": "split_image.py",
+        "className": "TilingBase",
+        "initInputs": [],
+        "functions": [
+          {
+            "name": "wait_for_cycle",
+            "input": [
+              {
+                "type": "Item",
+                "name": "item"
+              }
+            ],
+            "output": [
+              {
+                "type": "Item",
+                "name": "output_item",
+                "actions": ["continue", "wait"]
+              }
+            ],
+            "displayIcon": "distribution-filled"
+          }
+        ]
+      }
+    ],
+    "services": [
+      {
+        "name": "wait-service",
+        "moduleName": "wait_module",
+        "runtime": {
+          "podType": "regular-xs",
+          "runnerImage": "dataloopai/dtlpy-agent:cpu.py3.8.opencv4.7",
+          "numReplicas": 1,
+          "concurrency": 1,
+          "singleAgent": false,
+          "autoscaler": {
+            "type": "rabbitmq",
+            "minReplicas": 0,
+            "maxReplicas": 1,
+            "queueLength": 10
+          },
+          "preemptible": false
+        },
+        "executionTimeout": 172800,
+        "drainTime": 600,
+        "onReset": "failed",
+        "runExecutionAsProcess": false,
+        "maxAttempts": 3,
+        "operation": "none"
+      },
+      {
+        "name": "image-tiling-split",
+        "moduleName": "image_tiling_split",
+        "runtime": {
+          "podType": "regular-xs",
+          "runnerImage": "dataloopai/dtlpy-agent:cpu.py3.8.opencv4.7",
+          "numReplicas": 10,
+          "concurrency": 1,
+          "singleAgent": false,
+          "autoscaler": {
+            "type": "rabbitmq",
+            "minReplicas": 0,
+            "maxReplicas": 1,
+            "queueLength": 10
+          },
+          "preemptible": false
+        },
+        "executionTimeout": 172800,
+        "drainTime": 600,
+        "onReset": "failed",
+        "runExecutionAsProcess": false,
+        "maxAttempts": 3,
+        "operation": "none"
+      }
+    ]
+  }
+}
