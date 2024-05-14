@@ -211,8 +211,15 @@ class TilingBase(dl.BaseServiceRunner):
     def add_to_parent_item(self, item: dl.Item):
         parent_item_id = item.id
         parent_item = item
-        filters = dl.Filters()
-        filters.add(field='metadata.user.parentItemId', values=parent_item_id)
+        custom_filter = {
+            'page': 0,
+            'pageSize': 0,
+            'resource': 'items',
+            'filter': {'$and': [{'hidden': True},
+                                {'type': 'file'},
+                                {'metadata.user.parentItemId': parent_item_id}]},
+        }
+        filters = dl.Filters(custom_filter=custom_filter)
         dataset = item.dataset
         items = dataset.items.list(filters=filters).all()
         ids = [item.id for item in items]
