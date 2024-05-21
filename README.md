@@ -27,7 +27,7 @@ The installation will create the following pipeline nodes:
      - `tile_size`: The size of each tile in pixels.
      - `min_overlapping`: The minimum overlap between adjacent tiles in pixels.
 
-2. ## **Wait For Cycle:**
+2. **Wait For Cycle:**
 
    - **Description:** Wait until all previous executions are done
 
