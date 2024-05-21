@@ -21,6 +21,7 @@ class TilingBase(dl.BaseServiceRunner):
 
     def __init__(self):
         self.logger = logger
+        self.cycle_status_dict = {}
         self.logger.info('Initializing Image Tiling Service')
 
     @staticmethod
@@ -81,6 +82,7 @@ class TilingBase(dl.BaseServiceRunner):
         pool = ThreadPool(processes=16)
         async_results = list()
         try:
+            # TODO ass tiles as file to support exact width/height as orig image
             tiles = ConstSizeTiles(image_size=image_data.shape[:2][::-1], tile_size=tile_size, min_overlapping=min_overlapping)
         except ValueError as e:
             self.logger.warning('Image is smaller than tile size, skipping')
@@ -132,16 +134,33 @@ class TilingBase(dl.BaseServiceRunner):
 
         return items
 
-    @staticmethod
-    def wait_for_cycle(item: dl.Item, context: dl.Context, progress: dl.Progress):
+    def wait_for_cycle(self, item: dl.Item, context: dl.Context, progress: dl.Progress):
         parent_item_id = item.metadata['user']['parentItemId']
         parent_item = item.dataset.items.get(item_id=parent_item_id)
-        parent_item.metadata['tiling']['processed'] += 1
-        if parent_item.metadata['tiling']['processed'] == parent_item.metadata['tiling']['total']:
-            progress.update(action="continue")
+        latest_status = 'continue'
+        node_id = context.node_id
+        success, response = dl.client_api.gen_request(
+            req_type="get",
+            path="/pipelines/{pipeline_id}/executions/{pipeline_execution_id}".format(
+                pipeline_id=context.pipeline_id,
+                pipeline_execution_id=context.pipeline_execution_id))
+
+        cycle_status = self.cycle_status_dict.get(context.pipeline_execution_id, 'wait')
+        if success and not cycle_status == 'continue':
+            nodes = response.json().get('nodes', list())
+            for node in nodes:
+                if (node.get('id', None) == node_id or node.get('status', None) == 'success' or node.get('status', None)
+                        == 'pending'):
+                    continue
+                else:
+                    latest_status = 'wait'
+                    break
+            self.cycle_status_dict[context.pipeline_execution_id] = latest_status
         else:
-            progress.update(action="wait")
-        parent_item.update()
+            latest_status = 'wait'
+
+        progress.update(action=latest_status)
+
         return parent_item
 
     @staticmethod
