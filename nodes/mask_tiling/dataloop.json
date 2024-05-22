@@ -1,0 +1,165 @@
+{
+  "displayName": "Image Tiling Mask Split",
+  "name": "image-tiling-mask-split",
+  "scope": "public",
+  "version": "0.0.7",
+  "description": "Split image to tiles based on tile height and width also with segmentation mask. Then, add all new segments to the main item",
+  "attributes": {
+    "Provider": "Dataloop",
+    "Category": "Pipeline",
+    "Pipeline Type": "Node",
+    "Node Type": "Image Utils"
+  },
+  "codebase": {
+    "type": "git",
+    "gitUrl": "https://github.com/dataloop-ai-apps/image-tiling-nodes.git",
+    "gitTag": "0.0.7"
+  },
+
+  "components": {
+    "pipelineNodes": [
+      {
+        "invoke": {
+          "type": "function",
+          "namespace": "image-tiling-mask-split.image_tiling_mask_split.split_image"
+        },
+        "categories": ["image-utils"],
+        "name": "split-image-with-mask",
+        "displayName": "Split Image With Mask",
+        "description": "Split image to tiles based on tile size and add mask to each tile",
+        "scope": "project",
+        "configuration": {
+          "fields": [
+            {
+              "name": "tile_height",
+              "title": "Tile Height",
+              "props": {
+                "title": true,
+                "type": "number",
+                "default": 500,
+                "required": true,
+                "placeholder": "Insert tile height"
+              },
+              "rules": [
+                {
+                  "type": "required",
+                  "effect": "error"
+                },
+                {
+                  "type": "gte",
+                  "value": 1e-7,
+                  "effect": "error",
+                  "errorMessage": "Tile height must be greater than 0"
+                }
+              ],
+              "widget": "dl-input"
+            },
+            {
+              "name": "tile_width",
+              "title": "Tile Height",
+              "props": {
+                "title": true,
+                "type": "number",
+                "default": 500,
+                "required": true,
+                "placeholder": "Insert tile width"
+              },
+              "rules": [
+                {
+                  "type": "required",
+                  "effect": "error"
+                },
+                {
+                  "type": "gte",
+                  "value": 1e-7,
+                  "effect": "error",
+                  "errorMessage": "Tile width must be greater than 0"
+                }
+              ],
+              "widget": "dl-input"
+            }
+          ]
+        }
+      },
+      {
+        "invoke": {
+          "type": "function",
+          "namespace": "image-tiling-mask-split.image_tiling_mask_split.add_mask_to_parent"
+        },
+        "categories": ["image-utils"],
+        "name": "add_to_parent_item",
+        "displayName": "Add Segmentation Annotations To Parent Item",
+        "description": "This function will add all segmentation annotations to the parent item",
+        "scope": "project"
+      }
+    ],
+    "modules": [
+      {
+        "name": "image_tiling_mask_split",
+        "entryPoint": "nodes/mask_tiling/split_image.py",
+        "className": "TilingBase",
+        "initInputs": [],
+        "functions": [
+          {
+            "name": "split_image",
+            "input": [
+              {
+                "type": "Item",
+                "name": "item"
+              }
+            ],
+            "output": [
+              {
+                "type": "Item[]",
+                "name": "items"
+              }
+            ],
+            "displayIcon": "distribution-filled"
+          },
+          {
+            "name": "add_mask_to_parent",
+            "input": [
+              {
+                "type": "Item",
+                "name": "item"
+              }
+            ],
+            "output": [
+              {
+                "type": "Item",
+                "name": "item"
+              }
+            ],
+            "displayIcon": "plus"
+          }
+        ]
+      }
+    ],
+    "services": [
+      {
+        "name": "image-tiling-split",
+        "moduleName": "image_tiling_split",
+        "runtime": {
+          "podType": "regular-xs",
+          "runnerImage": "dataloopai/dtlpy-agent:cpu.py3.8.opencv4.7",
+          "numReplicas": 10,
+          "concurrency": 1,
+          "singleAgent": false,
+          "autoscaler": {
+            "type": "rabbitmq",
+            "minReplicas": 0,
+            "maxReplicas": 1,
+            "queueLength": 10
+          },
+          "preemptible": false
+        },
+        "executionTimeout": 172800,
+        "drainTime": 600,
+        "onReset": "failed",
+        "runExecutionAsProcess": false,
+        "maxAttempts": 3,
+        "operation": "none"
+      }
+    ]
+  }
+}

@@ -1,0 +1,386 @@
+{
+  "name": "smart-tiling-template",
+  "version": "1.0.0",
+  "attributes": {
+    "Category": "Pipeline",
+    "Pipeline Type": "Template"
+  },
+  "displayName": "Smart Tiling",
+  "codebase": {
+    "type": "git",
+    "gitUrl": "https://github.com/dataloop-ai-apps/image-tiling-nodes.git",
+    "gitTag": "0.0.7"
+  },
+  "dependencies": [
+    {
+      "name": "image-tiling-split"
+    }
+  ],
+
+  "components": {
+    "pipelineTemplates": [
+      {
+        "connections": [
+          {
+            "src": {
+              "nodeId": "b76e77a3-410e-463e-8e45-5bcfa4527112",
+              "portId": "9872b9ad-a1a7-44a3-aa34-6a9c61083b2a"
+            },
+            "tgt": {
+              "nodeId": "5f24b905-a3d9-4fef-982c-53091dfb2761",
+              "portId": "08ad0a9b-e8f0-48b4-8ab8-8fd82195a025"
+            },
+            "condition": "{}"
+          },
+          {
+            "src": {
+              "nodeId": "5f24b905-a3d9-4fef-982c-53091dfb2761",
+              "portId": "f231f366-e41a-4729-a0f8-b1ab7ba401d2"
+            },
+            "tgt": {
+              "nodeId": "ff52ca29-ea09-4f62-8d73-6465c9631036",
+              "portId": "6cb18b6c-5f45-4d43-97be-6397fa7f01f2"
+            },
+            "condition": "{}"
+          },
+          {
+            "src": {
+              "nodeId": "ff52ca29-ea09-4f62-8d73-6465c9631036",
+              "portId": "c015bd19-131a-4ae4-94a4-17a2463f2276"
+            },
+            "tgt": {
+              "nodeId": "c56be01a-e48a-40f8-a057-2527763c47ba",
+              "portId": "e82ea692-1841-4bc4-9106-9290e78aa1dc"
+            },
+            "condition": "{}"
+          },
+          {
+            "src": {
+              "nodeId": "c56be01a-e48a-40f8-a057-2527763c47ba",
+              "portId": "56dd06b7-036d-4ac8-8921-8646e4a6764b"
+            },
+            "tgt": {
+              "nodeId": "916ec9ad-6a37-408c-a22f-2d63f04aa3e4",
+              "portId": "0e64913d-679a-404e-9006-42857b449462"
+            },
+            "condition": "{}",
+            "action": "continue"
+          }
+        ],
+        "startNodes": [
+          {
+            "nodeId": "b76e77a3-410e-463e-8e45-5bcfa4527112",
+            "type": "root"
+          }
+        ],
+        "variables": [],
+        "description": "",
+        "name": "Smart Tiling",
+        "nodes": [
+          {
+            "id": "b76e77a3-410e-463e-8e45-5bcfa4527112",
+            "inputs": [
+              {
+                "portId": "42c31fdc-253e-4114-ae09-b4eaefd07294",
+                "nodeId": "42c31fdc-253e-4114-ae09-b4eaefd07294",
+                "type": "Item",
+                "name": "item",
+                "displayName": "item",
+                "io": "input"
+              }
+            ],
+            "outputs": [
+              {
+                "portId": "9872b9ad-a1a7-44a3-aa34-6a9c61083b2a",
+                "nodeId": "9872b9ad-a1a7-44a3-aa34-6a9c61083b2a",
+                "type": "Item",
+                "name": "item",
+                "displayName": "item",
+                "io": "output"
+              }
+            ],
+            "name": "Not Selected",
+            "type": "storage",
+            "namespace": {
+              "functionName": "dataset_handler",
+              "serviceName": "pipeline-utils",
+              "moduleName": null,
+              "packageName": null
+            },
+            "metadata": {
+              "position": {
+                "x": 9848.7509765625,
+                "y": 9712.62890625,
+                "z": 0
+              },
+              "repeatable": true
+            }
+          },
+          {
+            "id": "5f24b905-a3d9-4fef-982c-53091dfb2761",
+            "inputs": [
+              {
+                "portId": "08ad0a9b-e8f0-48b4-8ab8-8fd82195a025",
+                "nodeId": "08ad0a9b-e8f0-48b4-8ab8-8fd82195a025",
+                "type": "Item",
+                "name": "item",
+                "displayName": "item",
+                "io": "input"
+              }
+            ],
+            "outputs": [
+              {
+                "portId": "f231f366-e41a-4729-a0f8-b1ab7ba401d2",
+                "nodeId": "f231f366-e41a-4729-a0f8-b1ab7ba401d2",
+                "type": "Item[]",
+                "name": "items",
+                "displayName": "items",
+                "io": "output"
+              }
+            ],
+            "name": "Split Image",
+            "type": "custom",
+            "namespace": {
+              "functionName": "split_image",
+              "serviceName": "image-tiling-split",
+              "moduleName": "image_tiling_split",
+              "packageName": "image-tiling-split"
+            },
+            "appName": "image-tiling-split",
+            "dpkName": "image-tiling-split",
+            "metadata": {
+              "position": {
+                "x": 10150.7509765625,
+                "y": 9713.62890625,
+                "z": 0
+              },
+              "serviceConfig": {
+                "initParams": {},
+                "name": "image-tiling-split",
+                "moduleName": "image_tiling_split",
+                "runtime": {
+                  "podType": "regular-xs",
+                  "runnerImage": "dataloopai/dtlpy-agent:cpu.py3.8.opencv4.7",
+                  "numReplicas": 10,
+                  "concurrency": 1,
+                  "singleAgent": false,
+                  "autoscaler": {
+                    "type": "rabbitmq",
+                    "minReplicas": 0,
+                    "maxReplicas": 1,
+                    "queueLength": 10
+                  },
+                  "preemptible": false
+                },
+                "executionTimeout": 172800,
+                "drainTime": 600,
+                "onReset": "failed",
+                "runExecutionAsProcess": false,
+                "maxAttempts": 3,
+                "operation": "none"
+              },
+              "componentGroupName": "image-utils",
+              "customNodeConfig": {
+                "tile_size": 500,
+                "min_overlapping": 50,
+                "validation": {
+                  "valid": true,
+                  "errors": []
+                }
+              },
+              "repeatable": true,
+              "pipelineNodeName": "Split Image"
+            }
+          },
+          {
+            "id": "ff52ca29-ea09-4f62-8d73-6465c9631036",
+            "inputs": [
+              {
+                "portId": "6cb18b6c-5f45-4d43-97be-6397fa7f01f2",
+                "nodeId": "6cb18b6c-5f45-4d43-97be-6397fa7f01f2",
+                "type": "Item",
+                "name": "item",
+                "displayName": "item",
+                "io": "input"
+              }
+            ],
+            "outputs": [
+              {
+                "portId": "c015bd19-131a-4ae4-94a4-17a2463f2276",
+                "nodeId": "c015bd19-131a-4ae4-94a4-17a2463f2276",
+                "type": "Item",
+                "name": "item",
+                "displayName": "item",
+                "io": "output"
+              },
+              {
+                "portId": "122eb2e5-8883-4ef3-b905-1e3d390d000c",
+                "nodeId": "122eb2e5-8883-4ef3-b905-1e3d390d000c",
+                "type": "Annotation[]",
+                "name": "annotations",
+                "displayName": "annotations",
+                "io": "output"
+              }
+            ],
+            "name": "Predict Model",
+            "type": "ml",
+            "namespace": {
+              "functionName": "predict",
+              "serviceName": "model-mgmt-app-predict",
+              "moduleName": "model-mgmt-app-predict",
+              "packageName": "model-mgmt-app"
+            },
+            "metadata": {
+              "position": {
+                "x": 10424.7509765625,
+                "y": 9712.62890625,
+                "z": 0
+              },
+              "repeatable": true
+            }
+          },
+          {
+            "id": "c56be01a-e48a-40f8-a057-2527763c47ba",
+            "inputs": [
+              {
+                "portId": "e82ea692-1841-4bc4-9106-9290e78aa1dc",
+                "nodeId": "e82ea692-1841-4bc4-9106-9290e78aa1dc",
+                "type": "Item",
+                "name": "item",
+                "displayName": "item",
+                "io": "input"
+              }
+            ],
+            "outputs": [
+              {
+                "portId": "56dd06b7-036d-4ac8-8921-8646e4a6764b",
+                "nodeId": "56dd06b7-036d-4ac8-8921-8646e4a6764b",
+                "type": "Item",
+                "name": "output_item",
+                "displayName": "output_item",
+                "actions": ["continue", "wait"],
+                "io": "output"
+              }
+            ],
+            "name": "Wait For Cycle",
+            "type": "custom",
+            "namespace": {
+              "functionName": "wait_for_cycle",
+              "serviceName": "wait-service",
+              "moduleName": "wait_module",
+              "packageName": "image-tiling-split"
+            },
+            "appName": "image-tiling-split",
+            "dpkName": "image-tiling-split",
+            "metadata": {
+              "position": {
+                "x": 10698.7509765625,
+                "y": 9712.62890625,
+                "z": 0
+              },
+              "serviceConfig": {
+                "initParams": {},
+                "name": "wait-service",
+                "moduleName": "wait_module",
+                "runtime": {
+                  "podType": "regular-xs",
+                  "runnerImage": "dataloopai/dtlpy-agent:cpu.py3.8.opencv4.7",
+                  "numReplicas": 1,
+                  "concurrency": 1,
+                  "singleAgent": false,
+                  "autoscaler": {
+                    "type": "rabbitmq",
+                    "minReplicas": 0,
+                    "maxReplicas": 1,
+                    "queueLength": 10
+                  },
+                  "preemptible": false
+                },
+                "executionTimeout": 172800,
+                "drainTime": 600,
+                "onReset": "failed",
+                "runExecutionAsProcess": false,
+                "maxAttempts": 3,
+                "operation": "none"
+              },
+              "componentGroupName": "image-utils",
+              "repeatable": true,
+              "pipelineNodeName": "wait_for_cycle"
+            }
+          },
+          {
+            "id": "916ec9ad-6a37-408c-a22f-2d63f04aa3e4",
+            "inputs": [
+              {
+                "portId": "0e64913d-679a-404e-9006-42857b449462",
+                "nodeId": "0e64913d-679a-404e-9006-42857b449462",
+                "type": "Item",
+                "name": "item",
+                "displayName": "item",
+                "io": "input"
+              }
+            ],
+            "outputs": [
+              {
+                "portId": "046c4857-bae8-4293-8fd8-991d8bda3fdb",
+                "nodeId": "046c4857-bae8-4293-8fd8-991d8bda3fdb",
+                "type": "Item",
+                "name": "item",
+                "displayName": "item",
+                "io": "output"
+              }
+            ],
+            "name": "Add Annotations To Main Item",
+            "type": "custom",
+            "namespace": {
+              "functionName": "add_to_parent_item",
+              "serviceName": "image-tiling-split",
+              "moduleName": "image_tiling_split",
+              "packageName": "image-tiling-split"
+            },
+            "appName": "image-tiling-split",
+            "dpkName": "image-tiling-split",
+            "metadata": {
+              "position": {
+                "x": 11086.7509765625,
+                "y": 9622.62890625,
+                "z": 0
+              },
+              "serviceConfig": {
+                "initParams": {},
+                "name": "image-tiling-split",
+                "moduleName": "image_tiling_split",
+                "runtime": {
+                  "podType": "regular-xs",
+                  "runnerImage": "dataloopai/dtlpy-agent:cpu.py3.8.opencv4.7",
+                  "numReplicas": 10,
+                  "concurrency": 1,
+                  "singleAgent": false,
+                  "autoscaler": {
+                    "type": "rabbitmq",
+                    "minReplicas": 0,
+                    "maxReplicas": 1,
+                    "queueLength": 10
+                  },
+                  "preemptible": false
+                },
+                "executionTimeout": 172800,
+                "drainTime": 600,
+                "onReset": "failed",
+                "runExecutionAsProcess": false,
+                "maxAttempts": 3,
+                "operation": "none"
+              },
+              "componentGroupName": "image-utils",
+              "repeatable": true,
+              "pipelineNodeName": "add_to_parent_item"
+            }
+          }
+        ],
+        "preview": "66435d1cc5574c79110f6a73",
+        "_id": "66435d3018bd8a170fe92853"
+      }
+    ],
+    "services": null
+  }
+}
