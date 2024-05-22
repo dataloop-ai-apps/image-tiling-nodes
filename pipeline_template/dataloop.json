@@ -6,11 +6,7 @@
     "Pipeline Type": "Template"
   },
   "displayName": "Smart Tiling",
-  "codebase": {
-    "type": "git",
-    "gitUrl": "https://github.com/dataloop-ai-apps/image-tiling-nodes.git",
-    "gitTag": "0.0.7"
-  },
+  "scope": "public",
   "dependencies": [
     {
       "name": "image-tiling-split"
