@@ -121,7 +121,7 @@
             "input": [
               {
                 "type": "Item",
-                "name": "item"
+                "name": "parent_item"
               }
             ],
             "output": [
@@ -137,8 +137,8 @@
     ],
     "services": [
       {
-        "name": "image-tiling-split",
-        "moduleName": "image_tiling_split",
+        "name": "image-tiling-mask-split",
+        "moduleName": "image_tiling_mask_split",
         "runtime": {
           "podType": "regular-xs",
           "runnerImage": "dataloopai/dtlpy-agent:cpu.py3.8.opencv4.7",
