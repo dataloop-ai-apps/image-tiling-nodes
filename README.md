@@ -59,5 +59,5 @@ To install the Dataloop Image Tiling Service from the Dataloop Marketplace, foll
 
 - **Smart Tiling**
 
-  - template for **Image Tiling Split**, to simplify the smart tiling pipeline creation
+  - Template for **Image Tiling Split**, to simplify the Smart Tiling pipeline creation
     <img src = "assets/smart_tiling.png">
