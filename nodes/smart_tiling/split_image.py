@@ -1,15 +1,21 @@
-import cv2
-import numpy as np
-import dtlpy as dl
 import logging
-from tiling import ConstSizeTiles
-from multiprocessing.pool import ThreadPool
 import os
+import sys
 import tempfile
 import time
+from multiprocessing.pool import ThreadPool
+
+import cv2
+import dtlpy as dl
+import numpy as np
 from rtree import index
 from shapely.geometry import Polygon
 
+
+sys.path.append(os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../../')))
+
+from utils import ConstSizeTiles
 
 logger = logging.getLogger(name='image_tiling')
 
@@ -81,25 +87,18 @@ class TilingBase(dl.BaseServiceRunner):
         temp_items_path = tempfile.mkdtemp()
         pool = ThreadPool(processes=16)
         async_results = list()
-        try:
-            # TODO ass tiles as file to support exact width/height as orig image
-            tiles = ConstSizeTiles(image_size=image_data.shape[:2][::-1], tile_size=tile_size, min_overlapping=min_overlapping)
-        except ValueError as e:
-            self.logger.warning('Image is smaller than tile size, skipping')
-            if 'user' not in item.metadata:
-                item.metadata['user'] = dict()
-            item.metadata['user']['parentItemId'] = item.id
-            item.metadata['user']['originalTop'] = 0
-            item.metadata['user']['originalLeft'] = 0
-            item.update()
-            return [item]
+
+        tiles = ConstSizeTiles(
+            image_size=image_data.shape[:2][::-1], tile_size=tile_size, min_overlapping=min_overlapping)
 
         self.logger.info('Splitting image into {} tiles'.format(len(tiles)))
         for i, (extent, out_size) in enumerate(tiles):
             x, y, w, h = extent
-            tile = self.read_data(image_data, x, y, w, h, out_size[0], out_size[1])
+            tile = self.read_data(image_data, x, y, w, h,
+                                  out_size[0], out_size[1])
 
-            file_path = os.path.join(temp_items_path, "{}_{}.jpg".format(item.name.split('.')[0], i))
+            file_path = os.path.join(
+                temp_items_path, "{}_{}.jpg".format(item.name.split('.')[0], i))
             cv2.imwrite(file_path, tile)
             async_results.append(
                 pool.apply_async(
@@ -127,11 +126,6 @@ class TilingBase(dl.BaseServiceRunner):
             upload = async_result.get()
             items.append(upload)
 
-        item.metadata['tiling'] = dict()
-        item.metadata['tiling']['total'] = len(items)
-        item.metadata['tiling']['processed'] = 0
-        item.update()
-
         return items
 
     def wait_for_cycle(self, item: dl.Item, context: dl.Context, progress: dl.Progress):
@@ -145,7 +139,8 @@ class TilingBase(dl.BaseServiceRunner):
                 pipeline_id=context.pipeline_id,
                 pipeline_execution_id=context.pipeline_execution_id))
 
-        cycle_status = self.cycle_status_dict.get(context.pipeline_execution_id, 'wait')
+        cycle_status = self.cycle_status_dict.get(
+            context.pipeline_execution_id, 'wait')
         if success and not cycle_status == 'continue':
             nodes = response.json().get('nodes', list())
             for node in nodes:
@@ -176,8 +171,10 @@ class TilingBase(dl.BaseServiceRunner):
         Returns:
             True if the boxes are the same object, False otherwise
         """
-        box_1 = [[box1['x1'], box1['y1']], [box1['x2'], box1['y1']], [box1['x2'], box1['y2']], [box1['x1'], box1['y2']]]
-        box_2 = [[box2['x1'], box2['y1']], [box2['x2'], box2['y1']], [box2['x2'], box2['y2']], [box2['x1'], box2['y2']]]
+        box_1 = [[box1['x1'], box1['y1']], [box1['x2'], box1['y1']],
+                 [box1['x2'], box1['y2']], [box1['x1'], box1['y2']]]
+        box_2 = [[box2['x1'], box2['y1']], [box2['x2'], box2['y1']],
+                 [box2['x2'], box2['y2']], [box2['x1'], box2['y2']]]
         poly_1 = Polygon(box_1)
         poly_2 = Polygon(box_2)
 
@@ -218,7 +215,8 @@ class TilingBase(dl.BaseServiceRunner):
         local_bounding_boxes = {}
         for annotation in annotations:
             key = annotation.label
-            box = {"label": key, 'x1': annotation.left + x, 'y1': annotation.top + y, 'x2': annotation.right + x, 'y2': annotation.bottom + y, 'metadata': annotation.metadata}
+            box = {"label": key, 'x1': annotation.left + x, 'y1': annotation.top + y,
+                   'x2': annotation.right + x, 'y2': annotation.bottom + y, 'metadata': annotation.metadata}
             if key in local_bounding_boxes:
                 local_bounding_boxes[key].append(box)
             else:
@@ -244,7 +242,8 @@ class TilingBase(dl.BaseServiceRunner):
         ids = [item.id for item in items]
 
         pool = ThreadPool(processes=6)
-        results = [pool.apply_async(self.process_item, (item_id,)) for item_id in ids]
+        results = [pool.apply_async(self.process_item, (item_id,))
+                   for item_id in ids]
         bounding_boxes = {}
 
         for result in results:
@@ -265,7 +264,8 @@ class TilingBase(dl.BaseServiceRunner):
             idx_dict[label] = index.Index()
             for i, box in enumerate(boxes):
                 # The bounding box format is (min_x, min_y, max_x, max_y)
-                idx_dict[label].insert(i, (box['x1'], box['y1'], box['x2'], box['y2']))
+                idx_dict[label].insert(
+                    i, (box['x1'], box['y1'], box['x2'], box['y2']))
 
         self.logger.info('Bounding boxes indexed')
 
@@ -273,7 +273,8 @@ class TilingBase(dl.BaseServiceRunner):
             final_boxes = boxes.copy()
             for i, box in enumerate(boxes):
                 # Query for nearby boxes
-                nearby_boxes = list(idx_dict[label].intersection((box['x1'], box['y1'], box['x2'], box['y2'])))
+                nearby_boxes = list(idx_dict[label].intersection(
+                    (box['x1'], box['y1'], box['x2'], box['y2'])))
                 for j in nearby_boxes:
                     if i != j and self.same_object(boxes[i], boxes[j]):
                         if self.bounding_box_area(boxes[i]) > self.bounding_box_area(boxes[j]):
@@ -289,7 +290,8 @@ class TilingBase(dl.BaseServiceRunner):
         new_annotations = dl.AnnotationCollection()
         for label, boxes in bounding_boxes.items():
             for box in boxes:
-                new_ann = dl.Box(top=box['y1'], left=box['x1'], bottom=box['y2'], right=box['x2'], label=label)
+                new_ann = dl.Box(
+                    top=box['y1'], left=box['x1'], bottom=box['y2'], right=box['x2'], label=label)
                 new_annotations.add(new_ann, metadata=box.get('metadata', {}))
 
         parent_item.annotations.upload(annotations=new_annotations)
