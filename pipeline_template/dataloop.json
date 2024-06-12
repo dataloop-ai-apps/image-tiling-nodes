@@ -1,6 +1,6 @@
 {
   "name": "smart-tiling-template",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "attributes": {
     "Category": "Pipeline",
     "Pipeline Type": "Template"
