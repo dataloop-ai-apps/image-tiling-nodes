@@ -2,6 +2,7 @@
   "name": "smart-tiling-template",
   "version": "0.0.7",
   "attributes": {
+    "Provider": "Dataloop",
     "Category": "Pipeline",
     "Pipeline Type": "Template"
   },
