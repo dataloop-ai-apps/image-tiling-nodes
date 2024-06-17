@@ -3,7 +3,8 @@
   "version": "0.0.9",
   "attributes": {
     "Category": "Pipeline",
-    "Pipeline Type": "Template"
+    "Pipeline Type": "Template",
+    "Provider": "Dataloop"
   },
   "displayName": "Smart Tiling",
   "scope": "public",
