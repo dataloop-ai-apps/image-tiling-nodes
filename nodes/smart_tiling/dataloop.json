@@ -6,9 +6,8 @@
   "description": "Split image to tiles based on tile size and minimal overlap",
   "attributes": {
     "Provider": "Dataloop",
-    "Category": "Pipeline",
-    "Pipeline Type": "Node",
-    "Node Type": "Image Utils"
+    "Category": "Application",
+    "Application Type": ["Pipeline Node"]
   },
   "codebase": {
     "type": "git",
@@ -22,9 +21,7 @@
           "type": "function",
           "namespace": "image-tiling-split.image_tiling_split.split_image"
         },
-        "categories": [
-          "image-utils"
-        ],
+        "categories": ["image-utils"],
         "name": "Split Image",
         "displayName": "Split Image",
         "description": "Split image to tiles based on tile size and minimal overlap",
@@ -48,7 +45,7 @@
                 },
                 {
                   "type": "gte",
-                  "value": 1e-07,
+                  "value": 1e-7,
                   "effect": "error",
                   "errorMessage": "Tile size must be greater than 0"
                 }
@@ -72,7 +69,7 @@
                 },
                 {
                   "type": "gte",
-                  "value": 1e-07,
+                  "value": 1e-7,
                   "effect": "error",
                   "errorMessage": "Minimal Overlapping must be greater than 0"
                 }
@@ -87,9 +84,7 @@
           "type": "function",
           "namespace": "wait-service.wait_module.wait_for_cycle"
         },
-        "categories": [
-          "image-utils"
-        ],
+        "categories": ["image-utils"],
         "name": "wait_for_cycle",
         "displayName": "Wait For Cycle",
         "description": "This function will wait till all executions before it are done",
@@ -100,9 +95,7 @@
           "type": "function",
           "namespace": "image-tiling-split.image_tiling_split.add_to_parent_item"
         },
-        "categories": [
-          "image-utils"
-        ],
+        "categories": ["image-utils"],
         "name": "add_to_parent_item",
         "displayName": "Add Annotations To Main Item",
         "description": "This function will add all annotations to the main item",
@@ -168,10 +161,7 @@
               {
                 "type": "Item",
                 "name": "output_item",
-                "actions": [
-                  "continue",
-                  "wait"
-                ]
+                "actions": ["continue", "wait"]
               }
             ],
             "displayIcon": "icon-dl-hourglass"
