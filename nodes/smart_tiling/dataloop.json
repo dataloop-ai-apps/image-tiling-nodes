@@ -2,7 +2,7 @@
   "displayName": "Image Tiling Split",
   "name": "image-tiling-split",
   "scope": "public",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Split image to tiles based on tile size and minimal overlap",
   "attributes": {
     "Provider": "Dataloop",
@@ -12,7 +12,7 @@
   "codebase": {
     "type": "git",
     "gitUrl": "https://github.com/dataloop-ai-apps/image-tiling-nodes.git",
-    "gitTag": "0.0.12"
+    "gitTag": "0.0.13"
   },
   "components": {
     "pipelineNodes": [
