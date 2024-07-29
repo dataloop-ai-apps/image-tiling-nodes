@@ -7,7 +7,8 @@
   "attributes": {
     "Provider": "Dataloop",
     "Category": "Application",
-    "Application Type": ["Pipeline Node"]
+    "Application Type": ["Pipeline Node"],
+    "Media Type": ["Image"]
   },
   "codebase": {
     "type": "git",
