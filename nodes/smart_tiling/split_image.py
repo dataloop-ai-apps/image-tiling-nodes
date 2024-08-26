@@ -128,36 +128,6 @@ class TilingBase(dl.BaseServiceRunner):
 
         return items
 
-    def wait_for_cycle(self, item: dl.Item, context: dl.Context, progress: dl.Progress):
-        parent_item_id = item.metadata['user']['parentItemId']
-        parent_item = item.dataset.items.get(item_id=parent_item_id)
-        latest_status = 'continue'
-        node_id = context.node_id
-        success, response = dl.client_api.gen_request(
-            req_type="get",
-            path="/pipelines/{pipeline_id}/executions/{pipeline_execution_id}".format(
-                pipeline_id=context.pipeline_id,
-                pipeline_execution_id=context.pipeline_execution_id))
-
-        cycle_status = self.cycle_status_dict.get(
-            context.pipeline_execution_id, 'wait')
-        if success and not cycle_status == 'continue':
-            nodes = response.json().get('nodes', list())
-            for node in nodes:
-                if (node.get('id', None) == node_id or node.get('status', None) == 'success' or node.get('status', None)
-                        == 'pending'):
-                    continue
-                else:
-                    latest_status = 'wait'
-                    break
-            self.cycle_status_dict[context.pipeline_execution_id] = latest_status
-        else:
-            latest_status = 'wait'
-
-        progress.update(action=latest_status)
-
-        return parent_item
-
     @staticmethod
     def same_object(box1, box2, trashold=0.7):
         """

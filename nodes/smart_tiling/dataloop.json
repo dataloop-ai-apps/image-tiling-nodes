@@ -83,17 +83,6 @@
       {
         "invoke": {
           "type": "function",
-          "namespace": "wait-service.wait_module.wait_for_cycle"
-        },
-        "categories": ["image-utils"],
-        "name": "wait_for_cycle",
-        "displayName": "Wait For Cycle",
-        "description": "This function will wait till all executions before it are done",
-        "scope": "project"
-      },
-      {
-        "invoke": {
-          "type": "function",
           "namespace": "image-tiling-split.image_tiling_split.add_to_parent_item"
         },
         "categories": ["image-utils"],
@@ -143,58 +132,9 @@
             "displayIcon": "icon-dl-node-annotation"
           }
         ]
-      },
-      {
-        "name": "wait_module",
-        "entryPoint": "nodes/smart_tiling/split_image.py",
-        "className": "TilingBase",
-        "initInputs": [],
-        "functions": [
-          {
-            "name": "wait_for_cycle",
-            "input": [
-              {
-                "type": "Item",
-                "name": "item"
-              }
-            ],
-            "output": [
-              {
-                "type": "Item",
-                "name": "output_item",
-                "actions": ["continue", "wait"]
-              }
-            ],
-            "displayIcon": "icon-dl-hourglass"
-          }
-        ]
       }
     ],
     "services": [
-      {
-        "name": "wait-service",
-        "moduleName": "wait_module",
-        "runtime": {
-          "podType": "regular-xs",
-          "runnerImage": "dataloopai/dtlpy-agent:cpu.py3.8.opencv4.7",
-          "numReplicas": 1,
-          "concurrency": 1,
-          "singleAgent": false,
-          "autoscaler": {
-            "type": "rabbitmq",
-            "minReplicas": 0,
-            "maxReplicas": 1,
-            "queueLength": 10
-          },
-          "preemptible": false
-        },
-        "executionTimeout": 172800,
-        "drainTime": 600,
-        "onReset": "failed",
-        "runExecutionAsProcess": false,
-        "maxAttempts": 3,
-        "operation": "none"
-      },
       {
         "name": "image-tiling-split",
         "moduleName": "image_tiling_split",
