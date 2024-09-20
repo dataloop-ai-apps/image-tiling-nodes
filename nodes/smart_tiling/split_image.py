@@ -10,6 +10,7 @@ import dtlpy as dl
 import numpy as np
 from rtree import index
 from shapely.geometry import Polygon
+import math
 
 
 sys.path.append(os.path.abspath(
@@ -29,6 +30,34 @@ class TilingBase(dl.BaseServiceRunner):
         self.logger = logger
         self.cycle_status_dict = {}
         self.logger.info('Initializing Image Tiling Service')
+
+    @staticmethod
+    def optimal_split(number, target_chunk_size=2000):
+        """
+        Calculate the optimal chunk size to split a number into parts close to the target chunk size.
+
+        Args:
+            number (int): The number to be split.
+            target_chunk_size (int): The desired chunk size.
+
+        Returns:
+            int: The optimal chunk size.
+        """
+        if number < target_chunk_size:
+            return number
+
+        if number % target_chunk_size == 0:
+            return target_chunk_size
+
+        chunks = round(number / target_chunk_size)
+        actual_chunk_size = math.ceil(number / chunks)
+
+        if chunks * target_chunk_size < number:
+            smaller_chunk_size = math.ceil(number / (chunks + 1))
+            if abs(smaller_chunk_size - target_chunk_size) < abs(actual_chunk_size - target_chunk_size):
+                actual_chunk_size = smaller_chunk_size
+
+        return actual_chunk_size
 
     @staticmethod
     def read_data(image_data, x, y, w, h, out_w, out_h):
