@@ -112,6 +112,7 @@ class TilingBase(dl.BaseServiceRunner):
         image_data = cv2.imread(item.download())
         node = context.node
         tile_size = node.metadata['customNodeConfig']['tile_size']
+        tile_size = (min(tile_size, image_data.shape[1]), min(tile_size, image_data.shape[0]))
         min_overlapping = node.metadata['customNodeConfig']['min_overlapping']
         temp_items_path = tempfile.mkdtemp()
         pool = ThreadPool(processes=16)
