@@ -120,9 +120,7 @@ class TilingBase(dl.BaseServiceRunner):
 
         tiles = ConstSizeTiles(
             image_size=image_data.shape[:2][::-1], tile_size=tile_size, min_overlapping=min_overlapping)
-        unique_tiles = set()
-        for extent, out_size in tiles:
-            unique_tiles.add((extent, out_size))
+        unique_tiles = set(tiles)
 
         self.logger.info('Splitting image into {} tiles'.format(len(tiles)))
         for i, (extent, out_size) in enumerate(unique_tiles):
