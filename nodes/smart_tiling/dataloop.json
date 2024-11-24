@@ -7,8 +7,13 @@
   "attributes": {
     "Provider": "Dataloop",
     "Category": "Application",
-    "Application Type": ["Pipeline Node"],
-    "Media Type": ["Image"]
+    "Application Type": [
+      "Pipeline Node"
+    ],
+    "Media Type": [
+      "Image"
+    ],
+    "License": "Apache 2.0"
   },
   "codebase": {
     "type": "git",
@@ -22,7 +27,9 @@
           "type": "function",
           "namespace": "image-tiling-split.image_tiling_split.split_image"
         },
-        "categories": ["image-utils"],
+        "categories": [
+          "image-utils"
+        ],
         "name": "Split Image",
         "displayName": "Split Image",
         "description": "Split image to tiles based on tile size and minimal overlap",
@@ -46,7 +53,7 @@
                 },
                 {
                   "type": "gte",
-                  "value": 1e-7,
+                  "value": 1e-07,
                   "effect": "error",
                   "errorMessage": "Tile size must be greater than 0"
                 }
@@ -70,7 +77,7 @@
                 },
                 {
                   "type": "gte",
-                  "value": 1e-7,
+                  "value": 1e-07,
                   "effect": "error",
                   "errorMessage": "Minimal Overlapping must be greater than 0"
                 }
@@ -85,7 +92,9 @@
           "type": "function",
           "namespace": "image-tiling-split.image_tiling_split.add_to_parent_item"
         },
-        "categories": ["image-utils"],
+        "categories": [
+          "image-utils"
+        ],
         "name": "add_to_parent_item",
         "displayName": "Add Annotations To Main Item",
         "description": "This function will add all annotations to the main item",
