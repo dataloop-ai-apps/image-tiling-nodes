@@ -112,6 +112,7 @@ class TilingBase(dl.BaseServiceRunner):
         image_data = cv2.imread(item.download())
         node = context.node
         tile_size = node.metadata['customNodeConfig']['tile_size']
+        crop_type = node.metadata['customNodeConfig']['crop_type']
         tile_size = (min(tile_size, image_data.shape[1]), min(tile_size, image_data.shape[0]))
         min_overlapping = node.metadata['customNodeConfig']['min_overlapping']
         temp_items_path = tempfile.mkdtemp()
@@ -156,6 +157,55 @@ class TilingBase(dl.BaseServiceRunner):
         for async_result in async_results:
             upload = async_result.get()
             items.append(upload)
+
+
+        self.logger.info(f'Crop type: {crop_type}')
+        if crop_type == 'crop_without_annotations':
+            return items
+
+
+        self.logger.info('Adding annotations to tiles')
+        filters = dl.Filters(values='box', field='type',resource='annotations')
+        ann = list(item.annotations.list(filters=filters))
+        for item_new in items:
+            tile_width = tile_size[0]
+            tile_height = tile_size[1]
+            builder = item_new.annotations.builder()
+            tile_start_x1 = item_new.metadata['user']['originalLeft']
+            tile_start_y1 = item_new.metadata['user']['originalTop']
+
+
+            all_annotations = index.Index()
+            for i,annotation in enumerate(ann):
+                x1, y1, x2, y2 = annotation.left, annotation.top, annotation.right, annotation.bottom
+                all_annotations.insert(i, (x1, y1, x2, y2))
+
+            fitting_annotations = []
+            for i in all_annotations.intersection((tile_start_x1, tile_start_y1, tile_start_x1 + tile_width, tile_start_y1 + tile_height)):
+                x1, y1, x2, y2 = ann[i].left, ann[i].top, ann[i].right, ann[i].bottom
+                new_x1 = max(x1, tile_start_x1) - tile_start_x1
+                new_y1 = max(y1, tile_start_y1) - tile_start_y1
+                new_x2 = min(x2, tile_start_x1 + tile_width) - tile_start_x1
+                new_y2 = min(y2, tile_start_y1 + tile_height) - tile_start_y1
+
+                
+
+                # make all int
+                new_x1 = int(new_x1)
+                new_y1 = int(new_y1)
+                new_x2 = int(new_x2)
+                new_y2 = int(new_y2)
+
+                if new_x1 < new_x2 and new_y1 < new_y2:
+                    builder.add(annotation_definition=dl.Box(top=new_y1,
+                                                            left=new_x1,
+                                                            bottom=new_y2,
+                                                            right=new_x2,
+                                                            label=ann[i].label))
+
+                    fitting_annotations.append((new_x1, new_y1, new_x2, new_y2))
+
+            item_new.annotations.upload(builder)
 
         return items
 
