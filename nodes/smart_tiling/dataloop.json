@@ -30,6 +30,32 @@
         "configuration": {
           "fields": [
             {
+              "name": "crop_type",
+              "title": "Crop Type ",
+              "props": {
+                "type": "string",
+                "required": true,
+                "options": [
+                  {
+                    "label": "Crop with Annotations",
+                    "value": "crop_with_annotations"
+                  },
+                  {
+                    "label": "Crop without Annotations",
+                    "value": "crop_without_annotations"
+                  }
+                ],
+                "default": "crop_without_annotations"
+              },
+              "rules": [
+                {
+                  "type": "required",
+                  "effect": "error"
+                }
+              ],
+              "widget": "dl-select"
+            },
+            {
               "name": "tile_size",
               "title": "Tile Size",
               "props": {
