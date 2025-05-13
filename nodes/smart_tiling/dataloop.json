@@ -167,23 +167,16 @@
         "runtime": {
           "podType": "regular-xs",
           "runnerImage": "dataloopai/dtlpy-agent:cpu.py3.8.opencv4.7",
-          "numReplicas": 10,
-          "concurrency": 1,
-          "singleAgent": false,
+          "concurrency": 10,
           "autoscaler": {
             "type": "rabbitmq",
             "minReplicas": 0,
             "maxReplicas": 1,
-            "queueLength": 10
+            "queueLength": 20
           },
           "preemptible": false
         },
-        "executionTimeout": 172800,
-        "drainTime": 600,
-        "onReset": "failed",
-        "runExecutionAsProcess": false,
-        "maxAttempts": 3,
-        "operation": "none"
+        "executionTimeout": 3600
       }
     ]
   }
