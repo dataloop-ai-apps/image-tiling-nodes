@@ -7,8 +7,13 @@
   "attributes": {
     "Provider": "Dataloop",
     "Category": "Application",
-    "Application Type": ["Pipeline Node"],
-    "Media Type": ["Image"]
+    "Application Type": [
+      "Pipeline Node"
+    ],
+    "Media Type": [
+      "Image"
+    ],
+    "License": "Apache 2.0"
   },
   "codebase": {
     "type": "git",
@@ -22,7 +27,9 @@
           "type": "function",
           "namespace": "image-tiling-mask-split.image_tiling_mask_split.split_image"
         },
-        "categories": ["image-utils"],
+        "categories": [
+          "image-utils"
+        ],
         "name": "split-image-with-mask",
         "displayName": "Split Image With Mask",
         "description": "Split image to tiles based on tile size and add mask to each tile",
@@ -46,7 +53,7 @@
                 },
                 {
                   "type": "gte",
-                  "value": 1e-7,
+                  "value": 1e-07,
                   "effect": "error",
                   "errorMessage": "Tile height must be greater than 0"
                 }
@@ -70,7 +77,7 @@
                 },
                 {
                   "type": "gte",
-                  "value": 1e-7,
+                  "value": 1e-07,
                   "effect": "error",
                   "errorMessage": "Tile width must be greater than 0"
                 }
@@ -85,7 +92,9 @@
           "type": "function",
           "namespace": "image-tiling-mask-split.image_tiling_mask_split.add_mask_to_parent"
         },
-        "categories": ["image-utils"],
+        "categories": [
+          "image-utils"
+        ],
         "name": "add_to_parent_item",
         "displayName": "Add Segmentation Annotations To Parent Item",
         "description": "This function will add all segmentation annotations to the parent item",
