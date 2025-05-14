@@ -109,6 +109,16 @@
                 }
               ],
               "widget": "dl-input"
+            },
+            {
+              "name": "copy_original_metadata",
+              "title": "Copy Original Item's Metadata",
+              "props": {
+                "type": "boolean",
+                "title": true,
+                "default": false
+              },
+              "widget": "dl-checkbox"
             }
           ]
         }

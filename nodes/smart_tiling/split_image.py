@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 import tempfile
-import time
+import copy
 from multiprocessing.pool import ThreadPool
 
 import cv2
@@ -113,6 +113,8 @@ class TilingBase(dl.BaseServiceRunner):
         node = context.node
         tile_size = node.metadata['customNodeConfig']['tile_size']
         crop_type = node.metadata['customNodeConfig']['crop_type']
+        copy_original_metadata_str = node.metadata['customNodeConfig']['copy_original_metadata']
+        copy_original_metadata_flag = copy_original_metadata_str.lower() == 'true'
         tile_size = (min(tile_size, image_data.shape[1]), min(tile_size, image_data.shape[0]))
         min_overlapping = node.metadata['customNodeConfig']['min_overlapping']
         temp_items_path = tempfile.mkdtemp()
@@ -122,6 +124,7 @@ class TilingBase(dl.BaseServiceRunner):
         tiles = ConstSizeTiles(
             image_size=image_data.shape[:2][::-1], tile_size=tile_size, min_overlapping=min_overlapping)
         unique_tiles = set(tiles)
+        original_item_metadata_json = item.to_json()['metadata']
 
         self.logger.info('Splitting image into {} tiles'.format(len(tiles)))
         for i, (extent, out_size) in enumerate(unique_tiles):
@@ -132,6 +135,19 @@ class TilingBase(dl.BaseServiceRunner):
             file_path = os.path.join(
                 temp_items_path, "{}_{}.jpg".format(item.name.split('.')[0], i))
             cv2.imwrite(file_path, tile)
+
+            prepared_tile_metadata = {}
+            if copy_original_metadata_flag and original_item_metadata_json:
+                prepared_tile_metadata = copy.deepcopy(original_item_metadata_json)
+                prepared_tile_metadata.pop('system', None)
+
+            current_user_meta_on_tile = prepared_tile_metadata.get('user')
+            if not isinstance(current_user_meta_on_tile, dict):
+                prepared_tile_metadata['user'] = {}
+            prepared_tile_metadata['user']['parentItemId'] = item.id
+            prepared_tile_metadata['user']['originalTop'] = y
+            prepared_tile_metadata['user']['originalLeft'] = x
+
             async_results.append(
                 pool.apply_async(
                     item.dataset.items.upload,
@@ -139,13 +155,7 @@ class TilingBase(dl.BaseServiceRunner):
                         "local_path": file_path,
                         "remote_path": '.dataloop_temp',
                         "overwrite": True,
-                        "item_metadata": {
-                            "user": {
-                                "parentItemId": item.id,
-                                "originalTop": y,
-                                "originalLeft": x,
-                            }
-                        },
+                        "item_metadata": prepared_tile_metadata, # Use the prepared metadata
                     },
                 )
             )
