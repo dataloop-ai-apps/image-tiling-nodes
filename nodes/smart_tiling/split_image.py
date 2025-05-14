@@ -113,8 +113,7 @@ class TilingBase(dl.BaseServiceRunner):
         node = context.node
         tile_size = node.metadata['customNodeConfig']['tile_size']
         crop_type = node.metadata['customNodeConfig']['crop_type']
-        copy_original_metadata_str = node.metadata['customNodeConfig']['copy_original_metadata']
-        copy_original_metadata_flag = copy_original_metadata_str.lower() == 'true'
+        copy_original_metadata_flag = node.metadata['customNodeConfig']['copy_original_metadata']
         tile_size = (min(tile_size, image_data.shape[1]), min(tile_size, image_data.shape[0]))
         min_overlapping = node.metadata['customNodeConfig']['min_overlapping']
         temp_items_path = tempfile.mkdtemp()
