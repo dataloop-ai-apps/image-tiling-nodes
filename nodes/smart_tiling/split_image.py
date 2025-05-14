@@ -348,3 +348,26 @@ class TilingBase(dl.BaseServiceRunner):
         parent_item.annotations.upload(annotations=new_annotations)
         self.logger.info('Bounding boxes annotations uploaded to Parent Item')
         return parent_item
+    
+if __name__ == "__main__":
+    import types
+    import dtlpy as dl
+    dl.setenv('<env>')
+    if dl.token_expired():
+        dl.login()
+    dataset: dl.Dataset = dl.datasets.get(dataset_id='<dataset_id>')
+    item: dl.Item = dataset.items.get(item_id='<item_id>')
+    mock_node_metadata = {
+        'customNodeConfig': {
+            'tile_size': 500,
+            'crop_type': 'crop_with_annotations',
+            'copy_original_metadata': True,
+            'min_overlapping': 50
+        }
+    }
+    mock_node = types.SimpleNamespace(metadata=mock_node_metadata)
+    mock_context = types.SimpleNamespace(node=mock_node)
+
+    tiling_base = TilingBase()
+
+    tiling_base.split_image(item, mock_context)
