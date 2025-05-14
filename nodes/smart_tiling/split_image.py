@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 import tempfile
-import time
+import copy
 from multiprocessing.pool import ThreadPool
 
 import cv2
@@ -138,9 +138,8 @@ class TilingBase(dl.BaseServiceRunner):
 
             prepared_tile_metadata = {}
             if copy_original_metadata_flag and original_item_metadata_json:
-                for key, value in original_item_metadata_json.items():
-                    if key != 'system':
-                        prepared_tile_metadata[key] = value
+                prepared_tile_metadata = copy.deepcopy(original_item_metadata_json)
+                prepared_tile_metadata.pop('system', None)
 
             current_user_meta_on_tile = prepared_tile_metadata.get('user')
             if not isinstance(current_user_meta_on_tile, dict):
