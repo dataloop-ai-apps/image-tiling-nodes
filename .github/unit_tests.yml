@@ -1,0 +1,32 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ 'main' ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest  # Ensure pytest is installed for the test runner
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          pytest

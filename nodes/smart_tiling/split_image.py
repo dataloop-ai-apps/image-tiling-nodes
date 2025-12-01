@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 import tempfile
-import time
+import copy
 from multiprocessing.pool import ThreadPool
 
 import cv2
@@ -112,6 +112,8 @@ class TilingBase(dl.BaseServiceRunner):
         image_data = cv2.imread(item.download())
         node = context.node
         tile_size = node.metadata['customNodeConfig']['tile_size']
+        crop_type = node.metadata['customNodeConfig']['crop_type']
+        copy_original_metadata_flag = node.metadata['customNodeConfig']['copy_original_metadata']
         tile_size = (min(tile_size, image_data.shape[1]), min(tile_size, image_data.shape[0]))
         min_overlapping = node.metadata['customNodeConfig']['min_overlapping']
         temp_items_path = tempfile.mkdtemp()
@@ -121,6 +123,7 @@ class TilingBase(dl.BaseServiceRunner):
         tiles = ConstSizeTiles(
             image_size=image_data.shape[:2][::-1], tile_size=tile_size, min_overlapping=min_overlapping)
         unique_tiles = set(tiles)
+        original_item_metadata_json = item.to_json()['metadata']
 
         self.logger.info('Splitting image into {} tiles'.format(len(tiles)))
         for i, (extent, out_size) in enumerate(unique_tiles):
@@ -131,6 +134,19 @@ class TilingBase(dl.BaseServiceRunner):
             file_path = os.path.join(
                 temp_items_path, "{}_{}.jpg".format(item.name.split('.')[0], i))
             cv2.imwrite(file_path, tile)
+
+            prepared_tile_metadata = {}
+            if copy_original_metadata_flag and original_item_metadata_json:
+                prepared_tile_metadata = copy.deepcopy(original_item_metadata_json)
+                prepared_tile_metadata.pop('system', None)
+
+            current_user_meta_on_tile = prepared_tile_metadata.get('user')
+            if not isinstance(current_user_meta_on_tile, dict):
+                prepared_tile_metadata['user'] = {}
+            prepared_tile_metadata['user']['parentItemId'] = item.id
+            prepared_tile_metadata['user']['originalTop'] = y
+            prepared_tile_metadata['user']['originalLeft'] = x
+
             async_results.append(
                 pool.apply_async(
                     item.dataset.items.upload,
@@ -138,13 +154,7 @@ class TilingBase(dl.BaseServiceRunner):
                         "local_path": file_path,
                         "remote_path": '.dataloop_temp',
                         "overwrite": True,
-                        "item_metadata": {
-                            "user": {
-                                "parentItemId": item.id,
-                                "originalTop": y,
-                                "originalLeft": x,
-                            }
-                        },
+                        "item_metadata": prepared_tile_metadata, # Use the prepared metadata
                     },
                 )
             )
@@ -156,6 +166,55 @@ class TilingBase(dl.BaseServiceRunner):
         for async_result in async_results:
             upload = async_result.get()
             items.append(upload)
+
+
+        self.logger.info(f'Crop type: {crop_type}')
+        if crop_type == 'crop_without_annotations':
+            return items
+
+
+        self.logger.info('Adding annotations to tiles')
+        filters = dl.Filters(values='box', field='type',resource='annotations')
+        ann = list(item.annotations.list(filters=filters))
+        for item_new in items:
+            tile_width = tile_size[0]
+            tile_height = tile_size[1]
+            builder = item_new.annotations.builder()
+            tile_start_x1 = item_new.metadata['user']['originalLeft']
+            tile_start_y1 = item_new.metadata['user']['originalTop']
+
+
+            all_annotations = index.Index()
+            for i,annotation in enumerate(ann):
+                x1, y1, x2, y2 = annotation.left, annotation.top, annotation.right, annotation.bottom
+                all_annotations.insert(i, (x1, y1, x2, y2))
+
+            fitting_annotations = []
+            for i in all_annotations.intersection((tile_start_x1, tile_start_y1, tile_start_x1 + tile_width, tile_start_y1 + tile_height)):
+                x1, y1, x2, y2 = ann[i].left, ann[i].top, ann[i].right, ann[i].bottom
+                new_x1 = max(x1, tile_start_x1) - tile_start_x1
+                new_y1 = max(y1, tile_start_y1) - tile_start_y1
+                new_x2 = min(x2, tile_start_x1 + tile_width) - tile_start_x1
+                new_y2 = min(y2, tile_start_y1 + tile_height) - tile_start_y1
+
+                
+
+                # make all int
+                new_x1 = int(new_x1)
+                new_y1 = int(new_y1)
+                new_x2 = int(new_x2)
+                new_y2 = int(new_y2)
+
+                if new_x1 < new_x2 and new_y1 < new_y2:
+                    builder.add(annotation_definition=dl.Box(top=new_y1,
+                                                            left=new_x1,
+                                                            bottom=new_y2,
+                                                            right=new_x2,
+                                                            label=ann[i].label))
+
+                    fitting_annotations.append((new_x1, new_y1, new_x2, new_y2))
+
+            item_new.annotations.upload(builder)
 
         return items
 

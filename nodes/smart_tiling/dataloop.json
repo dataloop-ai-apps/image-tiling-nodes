@@ -2,18 +2,23 @@
   "displayName": "Image Tiling Split",
   "name": "image-tiling-split",
   "scope": "public",
-  "version": "0.0.17",
+  "version": "0.0.23",
   "description": "Split image to tiles based on tile size and minimal overlap",
   "attributes": {
     "Provider": "Dataloop",
     "Category": "Application",
-    "Application Type": ["Pipeline Node"],
-    "Media Type": ["Image"]
+    "Application Type": [
+      "Pipeline Node"
+    ],
+    "Media Type": [
+      "Image"
+    ],
+    "License": "Apache 2.0"
   },
   "codebase": {
     "type": "git",
     "gitUrl": "https://github.com/dataloop-ai-apps/image-tiling-nodes.git",
-    "gitTag": "0.0.17"
+    "gitTag": "0.0.23"
   },
   "components": {
     "pipelineNodes": [
@@ -22,13 +27,41 @@
           "type": "function",
           "namespace": "image-tiling-split.image_tiling_split.split_image"
         },
-        "categories": ["image-utils"],
+        "categories": [
+          "image-utils"
+        ],
         "name": "Split Image",
         "displayName": "Split Image",
         "description": "Split image to tiles based on tile size and minimal overlap",
         "scope": "project",
         "configuration": {
           "fields": [
+            {
+              "name": "crop_type",
+              "title": "Crop Type ",
+              "props": {
+                "type": "string",
+                "required": true,
+                "options": [
+                  {
+                    "label": "Crop with Annotations",
+                    "value": "crop_with_annotations"
+                  },
+                  {
+                    "label": "Crop without Annotations",
+                    "value": "crop_without_annotations"
+                  }
+                ],
+                "default": "crop_without_annotations"
+              },
+              "rules": [
+                {
+                  "type": "required",
+                  "effect": "error"
+                }
+              ],
+              "widget": "dl-select"
+            },
             {
               "name": "tile_size",
               "title": "Tile Size",
@@ -46,7 +79,7 @@
                 },
                 {
                   "type": "gte",
-                  "value": 1e-7,
+                  "value": 1e-07,
                   "effect": "error",
                   "errorMessage": "Tile size must be greater than 0"
                 }
@@ -70,12 +103,22 @@
                 },
                 {
                   "type": "gte",
-                  "value": 1e-7,
+                  "value": 1e-07,
                   "effect": "error",
                   "errorMessage": "Minimal Overlapping must be greater than 0"
                 }
               ],
               "widget": "dl-input"
+            },
+            {
+              "name": "copy_original_metadata",
+              "title": "Copy Original Item's Metadata",
+              "props": {
+                "type": "boolean",
+                "title": true,
+                "default": false
+              },
+              "widget": "dl-checkbox"
             }
           ]
         }
@@ -85,7 +128,9 @@
           "type": "function",
           "namespace": "image-tiling-split.image_tiling_split.add_to_parent_item"
         },
-        "categories": ["image-utils"],
+        "categories": [
+          "image-utils"
+        ],
         "name": "add_to_parent_item",
         "displayName": "Add Annotations To Main Item",
         "description": "This function will add all annotations to the main item",
@@ -141,23 +186,16 @@
         "runtime": {
           "podType": "regular-xs",
           "runnerImage": "dataloopai/dtlpy-agent:cpu.py3.8.opencv4.7",
-          "numReplicas": 10,
-          "concurrency": 1,
-          "singleAgent": false,
+          "concurrency": 10,
           "autoscaler": {
             "type": "rabbitmq",
             "minReplicas": 0,
             "maxReplicas": 1,
-            "queueLength": 10
+            "queueLength": 20
           },
           "preemptible": false
         },
-        "executionTimeout": 172800,
-        "drainTime": 600,
-        "onReset": "failed",
-        "runExecutionAsProcess": false,
-        "maxAttempts": 3,
-        "operation": "none"
+        "executionTimeout": 3600
       }
     ]
   }
