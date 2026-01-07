@@ -3,3 +3,4 @@ shapely
 dtlpy
 rtree
 urllib3>=2.5.0 # not directly required, pinned by Snyk to avoid a vulnerability
+aiohttp>=3.13.3 # not directly required, pinned by Snyk to avoid a vulnerability
