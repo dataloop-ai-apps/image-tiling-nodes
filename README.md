@@ -4,19 +4,19 @@ This repo includes 2 pipeline nodes app and 1 pipeline template.
 
 ## Installation
 
-To install the Dataloop Image Tiling Service from the Dataloop Marketplace, follow these steps:
+To install the DDOE Image Tiling Service from the DDOE Marketplace, follow these steps:
 
-1. **Sign in to Dataloop:**
-   Go to the Dataloop platform and sign in with your credentials.
+1. **Sign in to DDOE:**
+   Go to the DDOE platform and sign in with your credentials.
 
 2. **Navigate to the Marketplace:**
-   In the Dataloop dashboard, navigate to the Marketplace section.
+   In the DDOE dashboard, navigate to the Marketplace section.
 
 3. **Find the App:**
    Search for the app, based on displayName in datallop.json in the Marketplace.
 
 4. **Install the App:**
-   Click on the App and follow the on-screen instructions to install it to your Dataloop environment.
+   Click on the App and follow the on-screen instructions to install it to your DDOE environment.
 
 ## Pipeline Nodes
 

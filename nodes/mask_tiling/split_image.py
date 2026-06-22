@@ -113,8 +113,8 @@ class TilingBase(dl.BaseServiceRunner):
         Split the image into tiles.
 
         Args:
-            item (dl.Item): Dataloop item.
-            context (dl.Context): Dataloop context, which contains the node with the configuration about tile size and overlapping.
+            item (dl.Item): DDOE item.
+            context (dl.Context): DDOE context, which contains the node with the configuration about tile size and overlapping.
 
         Returns:
             list: List of parent items with the bounding boxes annotations.

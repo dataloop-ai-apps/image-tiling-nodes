@@ -102,8 +102,8 @@ class TilingBase(dl.BaseServiceRunner):
         Split the image into tiles.
 
         Args:
-            item: dataloop item
-            context: dataloop context, which contains the node with the configuration about tile size and overlapping
+            item: DDOE item
+            context: DDOE context, which contains the node with the configuration about tile size and overlapping
 
         Returns:
             parent item with the bounding boxes annotations
@@ -161,7 +161,7 @@ class TilingBase(dl.BaseServiceRunner):
         pool.close()
         pool.join()
 
-        self.logger.info('Temporary items uploaded to Dataloop')
+        self.logger.info('Temporary items uploaded to DDOE')
         items = list()
         for async_result in async_results:
             upload = async_result.get()

@@ -5,7 +5,7 @@
   "version": "0.0.24",
   "description": "Split image to tiles based on tile size and minimal overlap",
   "attributes": {
-    "Provider": "Dataloop",
+    "Provider": "DDOE",
     "Category": "Application",
     "Application Type": [
       "Pipeline Node"
