@@ -13,7 +13,7 @@ from nodes.smart_tiling.split_image import TilingBase
 class TestSplitImage(unittest.TestCase):
 
     def test_split_image_logic(self):
-        # --- Mock Dataloop and environment setup ---
+        # --- Mock DDOE and environment setup ---
         # Comment out or replace with actual setup if integration testing is needed
         # dl.setenv('<env>')
         # if dl.token_expired():
@@ -21,7 +21,7 @@ class TestSplitImage(unittest.TestCase):
         # dataset: dl.Dataset = dl.datasets.get(dataset_id='<dataset_id>')
         # item: dl.Item = dataset.items.get(item_id='<item_id>')
 
-        # Basic Mocking for Dataloop Item
+        # Basic Mocking for DDOE Item
         mock_item = unittest.mock.MagicMock(spec=dl.Item)
         mock_item.id = 'mock_item_id_123'
         mock_item.name = 'test_image.jpg'

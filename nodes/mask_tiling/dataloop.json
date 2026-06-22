@@ -5,7 +5,7 @@
   "version": "0.0.24",
   "description": "Split image to tiles based on tile height and width also with segmentation mask. Then, add all new segments to the main item",
   "attributes": {
-    "Provider": "Dataloop",
+    "Provider": "DDOE",
     "Category": "Application",
     "Application Type": [
       "Pipeline Node"
